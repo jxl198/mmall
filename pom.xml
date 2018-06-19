@@ -248,12 +248,12 @@
         <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
         <version>3.2.4.RELEASE</version>
-        <scope>provided</scope>
-    </dependency>
-    </dependencies>
+<scope>provided</scope>
+        </dependency>
+        </dependencies>
 
 
-    <build>
+<build>
         <finalName>mmall</finalName>
         <plugins>
             <plugin>
