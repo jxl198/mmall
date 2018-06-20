@@ -3,8 +3,7 @@ package com.mmall.common;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,9 +12,9 @@ import java.util.concurrent.TimeUnit;
  * @description 使用guava本地缓存
  * @date 2018-05-29 14:26
  **/
+@Slf4j
 public class TokenCache {
 
-    private static Logger logger = LoggerFactory.getLogger(TokenCache.class);
 
     public static final String TOKEN_PREFIX="token_";
 
@@ -40,7 +39,7 @@ public class TokenCache {
                 return null;
             }
         } catch (Exception e) {
-            logger.error("localCache get error", e);
+            log.error("localCache get error", e);
         }
         return value;
     }
