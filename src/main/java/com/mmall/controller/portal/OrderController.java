@@ -89,7 +89,7 @@ public class OrderController {
      * @param orderNo
      * @return
      */
-    @RequestMapping(value = "pay.do", method = RequestMethod.POST)
+    @RequestMapping(value = "query_order_pay_status.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<Boolean> queryOrderPayStatus(HttpSession session, Long orderNo) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
@@ -166,11 +166,4 @@ public class OrderController {
         }
         return iOrderService.getOrderList(user.getId(),pageNum,pageSize);
     }
-
-
-
-
-
-
-
 }

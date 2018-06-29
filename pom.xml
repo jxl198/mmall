@@ -288,8 +288,53 @@
                 </configuration>
             </plugin>
         </plugins>
-
+        <resources>
+            <resource>
+                <directory>src/main/resources/${deploy.type}</directory>
+                <excludes>
+                    <exclude>*.jsp</exclude>
+                </excludes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>dev/*</exclude>
+                    <exclude>prod/*</exclude>
+                    <exclude>beta/*</exclude>
+                </excludes>
+               <!-- <includes>
+                    <include>*.xml</include>
+                    <include>mappers/*</include>
+                </includes>-->
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <deploy.type>dev</deploy.type>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <deploy.type>prod</deploy.type>
+            </properties>
+        </profile>
+        <profile>
+            <id>beta</id>
+            <properties>
+                <deploy.type>beta</deploy.type>
+            </properties>
+        </profile>
+
+    </profiles>
 
 
 </project>

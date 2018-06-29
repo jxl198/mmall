@@ -16,6 +16,11 @@ public class Const {
     public static final String EMAIL = "email";
     public static final String USER_NAME = "username";
 
+    public interface RedisCacheExTime{
+        int REDIS_SESSION_EXPIRE_TIME=60*30;  //30分钟
+    }
+
+
     public interface Role {
         int ROLE_CUSTOMER = 0; //普通用户
         int ROLE_ADMIN = 1;   //管理员
@@ -152,5 +157,7 @@ public class Const {
             throw new RuntimeException("没有找到相应的枚举");
          }
     }
+
+
 
 }

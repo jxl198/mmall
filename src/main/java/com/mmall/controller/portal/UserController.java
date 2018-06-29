@@ -5,6 +5,8 @@ import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
+import com.mmall.util.JsonUtil;
+import com.mmall.util.RedisPoolUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +20,9 @@ import javax.servlet.http.HttpSession;
 public class UserController {
     @Autowired
     private IUserService iUserService;
-     static {
-        System.out.println("测试数据") ;
+
+    static {
+        System.out.println("测试数据");
     }
 
     @RequestMapping(value = "login.do", method = RequestMethod.POST)
@@ -27,7 +30,9 @@ public class UserController {
     public ServerResponse<User> login(String username, String password, HttpSession session) {
         ServerResponse<User> serverResponse = iUserService.login(username, password);
         if (serverResponse.isSuccess()) {
-            session.setAttribute(Const.CURRENT_USER, serverResponse.getData());
+            System.out.println("测试修改");
+            // session.setAttribute(Const.CURRENT_USER, serverResponse.getData());
+            RedisPoolUtil.setEx(session.getId(), JsonUtil.obj2String(serverResponse.getData()), Const.RedisCacheExTime.REDIS_SESSION_EXPIRE_TIME);
         }
         return serverResponse;
 
