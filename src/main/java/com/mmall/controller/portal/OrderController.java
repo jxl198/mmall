@@ -33,7 +33,9 @@ import java.util.Map;
 public class OrderController {
     @Autowired
     private IOrderService iOrderService;
-
+    static {
+        System.out.println("测试缓凝----------------------");
+    }
 
     @RequestMapping(value = "pay.do", method = RequestMethod.POST)
     @ResponseBody
