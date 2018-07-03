@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
  **/
 @Slf4j
 public class CookieUtil {
-    private static final String COOKIE_DOMAIN = ".happymmall.com";
+    private static final String COOKIE_DOMAIN = ".imooc.com";
     private static final String COOKIE_NAME = "mmall_login_token";
 
     /**
@@ -27,6 +27,7 @@ public class CookieUtil {
         Cookie ck = new Cookie(COOKIE_NAME, token);
         ck.setDomain(COOKIE_DOMAIN);
         ck.setPath("/");  //代表设置在根目录
+        ck.setHttpOnly(true);  //防止脚本攻击，不许使用脚本访问cookie
         //如果maxage不设置，cookie不会写入硬盘，只会写入内存，只在当前页面有效
         ck.setMaxAge(60 * 60 * 24 * 365); //-1 代表永久 单位是秒
         log.info("write cookieName:{},cookieValue:{},", ck.getName(), ck.getValue());
