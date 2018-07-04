@@ -73,6 +73,7 @@ public class RedisPoolUtil {
     public static Long expire(String key,int exTime) {
         Jedis jedis = null;
         Long result = null;
+        System.out.println("ceshi-------------------------");
         try {
             jedis = RedisPool.getJedis();
             result = jedis.expire(key,exTime);

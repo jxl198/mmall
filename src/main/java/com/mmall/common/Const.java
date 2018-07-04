@@ -15,6 +15,8 @@ public class Const {
     public static final String CURRENT_USER = "currentUser";
     public static final String EMAIL = "email";
     public static final String USER_NAME = "username";
+    public static final String TOKEN_PREFIX="token_";
+
 
     public interface RedisCacheExTime{
         int REDIS_SESSION_EXPIRE_TIME=60*30;  //30分钟

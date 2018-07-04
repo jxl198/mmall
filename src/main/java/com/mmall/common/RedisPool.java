@@ -49,11 +49,11 @@ public class RedisPool {
 
     }
 
-    public static void main(String[] args) {
-        Jedis jedis = getJedis();
-        jedis.set("name", "jxl");
-        close(jedis);
-        pool.destroy();  //临时调用，销毁连接池中的所有拦截
-        System.out.println("program is end ");
-    }
+//    public static void main(String[] args) {
+//        Jedis jedis = getJedis();
+//        jedis.set("name", "jxl");
+//        close(jedis);
+//        pool.destroy();  //临时调用，销毁连接池中的所有拦截
+//        System.out.println("program is end ");
+//    }
 }
