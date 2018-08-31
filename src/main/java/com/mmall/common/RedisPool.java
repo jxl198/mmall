@@ -30,7 +30,10 @@ public class RedisPool {
         jedisPoolConfig.setTestOnBorrow(testOnBorrow);
         jedisPoolConfig.setTestOnReturn(testOnReturn);
         jedisPoolConfig.setBlockWhenExhausted(true);  //连接池 满的时候是否阻塞
+
         pool = new JedisPool(jedisPoolConfig, redisIp, port);  //创建连接池
+
+
     }
 
 
@@ -39,7 +42,9 @@ public class RedisPool {
     }
 
     public static Jedis getJedis() {
-        return pool.getResource();
+        Jedis jedis = pool.getResource();
+        jedis.auth("jiangxl");
+        return jedis;
     }
 
     public static void close(Jedis jedis) {

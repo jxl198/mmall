@@ -33,6 +33,7 @@ import com.mmall.vo.ShippingVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,7 +73,6 @@ public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     private ShippingMapper shippingMapper;
-
 
 
     static {
@@ -483,71 +483,70 @@ public class OrderServiceImpl implements IOrderService {
 
     public ServerResponse<PageInfo> getOrderList(Integer userId, int pageNum, int pageSize) {
 
-        PageHelper.startPage(pageNum,pageSize);
+        PageHelper.startPage(pageNum, pageSize);
         List<Order> orderList = orderMapper.selectByUserId(userId);
-        List<OrderVo> orderVoList = assembleOrderVoList(userId,orderList);
+        List<OrderVo> orderVoList = assembleOrderVoList(userId, orderList);
         PageInfo pageInfo = new PageInfo(orderList);
         pageInfo.setList(orderVoList);
         return ServerResponse.createBySuccess(pageInfo);
     }
 
-    private List<OrderVo> assembleOrderVoList(Integer userId,List<Order> orderList){
+    private List<OrderVo> assembleOrderVoList(Integer userId, List<Order> orderList) {
         List<OrderVo> orderVoList = Lists.newArrayList();
-        for(Order order:orderList){
+        for (Order order : orderList) {
             List<OrderItem> orderItemList = Lists.newArrayList();
-            if(userId==null){
+            if (userId == null) {
                 //todo 管理员查询的时候，不需要传userid
                 orderItemList = orderItemMapper.getByOrderNo(order.getOrderNo());
+            } else {
+                orderItemList = orderItemMapper.getByOrderNoUserId(order.getOrderNo(), userId);
             }
-            else{
-                 orderItemList =  orderItemMapper.getByOrderNoUserId(order.getOrderNo(),userId);
-            }
-            orderVoList.add(assembleOrderVo(order,orderItemList));
+            orderVoList.add(assembleOrderVo(order, orderItemList));
 
         }
         return orderVoList;
     }
 
     //backend
-   public  ServerResponse<PageInfo> manageList(int pageNum,int pageSize){
-        PageHelper.startPage(pageNum,pageSize);
+    public ServerResponse<PageInfo> manageList(int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
         List<Order> orderList = orderMapper.selectAll();
-        List<OrderVo> orderVoList = assembleOrderVoList(null,orderList);
-        PageInfo pageInfo  = new PageInfo(orderList);
+        List<OrderVo> orderVoList = assembleOrderVoList(null, orderList);
+        PageInfo pageInfo = new PageInfo(orderList);
         pageInfo.setList(orderVoList);
         return ServerResponse.createBySuccess(pageInfo);
     }
 
 
-    public ServerResponse<OrderVo> manageDetail(Long orderNo){
+    public ServerResponse<OrderVo> manageDetail(Long orderNo) {
         Order order = orderMapper.selectByOrderNo(orderNo);
-        if(order==null){
+        if (order == null) {
             return ServerResponse.createByErrorMessage("订单不存在");
         }
         List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(orderNo);
-        OrderVo orderVo = assembleOrderVo(order,orderItemList);
+        OrderVo orderVo = assembleOrderVo(order, orderItemList);
         return ServerResponse.createBySuccess(orderVo);
     }
 
 
-    public ServerResponse<PageInfo> manageSearch(Long orderNo,int pageNum,int pageSize){
-        PageHelper.startPage(pageNum,pageSize);
+    public ServerResponse<PageInfo> manageSearch(Long orderNo, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
         Order order = orderMapper.selectByOrderNo(orderNo);
-        if(order==null){
+        if (order == null) {
             return ServerResponse.createByErrorMessage("订单不存在");
         }
         List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(orderNo);
-        OrderVo orderVo = assembleOrderVo(order,orderItemList);
-        PageInfo pageInfo= new PageInfo(Lists.newArrayList(order));
+        OrderVo orderVo = assembleOrderVo(order, orderItemList);
+        PageInfo pageInfo = new PageInfo(Lists.newArrayList(order));
         pageInfo.setList(Lists.newArrayList(orderVo));
         return ServerResponse.createBySuccess(pageInfo);
     }
 
-    public ServerResponse<String> manageSendGoods(Long orderNo){
+    public ServerResponse<String> manageSendGoods(Long orderNo) {
         Order order = orderMapper.selectByOrderNo(orderNo);
-        if(order !=null){
+        if (order != null) {
             //判断状态
-            if(order.getStatus()==Const.OrderStatusEnum.PAID.getCode()){
+            if (order.getStatus() == Const.OrderStatusEnum.PAID.getCode()) {
                 order.setStatus(Const.OrderStatusEnum.SHIPPED.getCode());
                 order.setSendTime(new Date());
                 orderMapper.updateByPrimaryKeySelective(order);
@@ -556,6 +555,29 @@ public class OrderServiceImpl implements IOrderService {
         }
 
         return ServerResponse.createByErrorMessage("订单不存在");
+
+    }
+
+    @Override
+    public void closeOrder(int hour) {
+        Date closeDateTime = DateUtils.addHours(new Date(), -1 * hour);
+        List<Order> orderList = orderMapper.selectOrderStatusByCreateTime(Const.OrderStatusEnum.NO_PAY.getCode(), DateTimeUtil.dateToStr(closeDateTime));
+        for (Order order : orderList) {
+            List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(order.getOrderNo());
+            for (OrderItem orderItem : orderItemList) {
+                Integer stock = productMapper.selectStockByProductId(orderItem.getProductId());
+                if (stock == null) {  //订单商品被删除，不需要更新
+                    continue;
+                }
+                Product product = new Product();
+                product.setId(orderItem.getProductId());
+                product.setStock(stock + orderItem.getQuantity());
+                productMapper.updateByPrimaryKeySelective(product);
+            }
+            orderMapper.closeOrderByOrderId(order.getId());
+            log.info("关闭订单：{}",order.getOrderNo());
+
+        }
 
     }
 }

@@ -23,9 +23,11 @@ public class RedisShardedPool {
 
     private static String masterRedisIp = PropertiesUtil.getProperty("redis.master.ip");
     private static Integer masterPort = PropertiesUtil.getInt("redis.master.port");
+    private static String masterRedisAuth = PropertiesUtil.getProperty("redis.master.auth");
+
     private static String slaveRedisIp = PropertiesUtil.getProperty("redis.slave.ip");
     private static Integer slaveRedisPort = PropertiesUtil.getInt("redis.slave.port");
-
+    private static String slaveRedisAuth = PropertiesUtil.getProperty("redis.slave.auth");
     private static void initPool() {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
         jedisPoolConfig.setMaxTotal(maxTotal);
@@ -36,9 +38,10 @@ public class RedisShardedPool {
         jedisPoolConfig.setBlockWhenExhausted(true);  //连接池 满的时候是否阻塞
         JedisShardInfo info1 = new JedisShardInfo(masterRedisIp, masterPort, 1000 * 2);
 //        如果有密码需要调用
-//        info1.setPassword("xxxx");
+       info1.setPassword(masterRedisAuth);
 
         JedisShardInfo info2 = new JedisShardInfo(slaveRedisIp, slaveRedisPort, 1000 * 2);
+        info2.setPassword(slaveRedisAuth);
         List<JedisShardInfo> jedisShardInfoList = new ArrayList<JedisShardInfo>(2);
         jedisShardInfoList.add(info1);
         jedisShardInfoList.add(info2);
@@ -64,7 +67,7 @@ public class RedisShardedPool {
     public static void main(String[] args) {
         ShardedJedis jedis = getJedis();
         for (int i = 0; i < 10; i++) {
-            jedis.set("key" + i, "value" + i);
+            System.out.println(jedis.get("key" + i));
         }
         close(jedis);
         System.out.println("program is end");

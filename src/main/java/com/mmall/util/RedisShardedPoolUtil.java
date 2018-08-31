@@ -99,4 +99,44 @@ public class RedisShardedPoolUtil {
         }
     }
 
+
+    public static Long setnx(String key, String value) {
+        ShardedJedis jedis = null;
+        Long result = null;
+
+        try {
+            jedis = RedisShardedPool.getJedis();
+            result = jedis.setnx(key, value);
+        } catch (Exception e) {
+            log.error("setnx key :{} value :{} error ", key, value, e);
+        } finally {
+            RedisShardedPool.close(jedis);
+            return result;
+        }
+
+    }
+
+    /**
+     * 返回旧值，设置新值，具有原子性
+     * @param key
+     * @param value
+     * @return
+     */
+    public static String getSet(String key, String value) {
+        ShardedJedis jedis = null;
+        String result = null;
+
+        try {
+            jedis = RedisShardedPool.getJedis();
+            result = jedis.getSet(key, value);
+        } catch (Exception e) {
+            log.error("getSet key :{} value :{} error ", key, value, e);
+        } finally {
+            RedisShardedPool.close(jedis);
+            return result;
+        }
+
+    }
+
+
 }
