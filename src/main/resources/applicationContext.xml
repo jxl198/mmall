@@ -25,7 +25,7 @@
 
     <!--<context:annotation-config/>-->
     <aop:aspectj-autoproxy/>
-    <context:property-placeholder locatio="classpath:datasource.properties,classpath:mmall.properties"/>
+    <context:property-placeholder location="classpath:datasource.properties,classpath:mmall.properties"/>
     <!--scheduler configuration  定时任务-->
     <task:annotation-driven/>
 
